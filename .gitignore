@@ -1,0 +1,11 @@
+/unity/.DS_Store/
+/unity/Library/
+/unity/Temp/
+/unity/Assets/FutileDemos/
+/unity/obj/
+*.csproj
+*.pidb
+*.unityproj
+*.sln
+*.userprefs
+*.suo
