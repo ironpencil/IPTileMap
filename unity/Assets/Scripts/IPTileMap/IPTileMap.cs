@@ -156,8 +156,8 @@ public class IPTileMap : FContainer
 
                         IPTile tile = new IPTile(tileData);
 
-                        tile.x = tileData.TileX * tileData.TileSet.TileWidth;
-                        tile.y = tileData.TileY * tileData.TileSet.TileHeight;
+                        tile.x = tileData.TileX * tileData.TileSet.TileWidth / Futile.displayScale;     // TileWidth is in pixel
+                        tile.y = tileData.TileY * tileData.TileSet.TileHeight / Futile.displayScale;    // TileHeight is in pixel
 
                         //the tile physically resides in the TileLayer container
                         //when the tile layer is added to the container, the tile will be as well
