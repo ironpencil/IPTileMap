@@ -42,10 +42,13 @@ public class IPObjectLayer : IPMapLayer
     public List<IPTiledObject> GetTiledObjectsContainingPoint(float x, float y)
     {
         List<IPTiledObject> objectList = new List<IPTiledObject>();
-
+		
+//		Vector2 checkPoint = GlobalToLocal(new Vector2(x, y));
+		Vector2 checkPoint = new Vector2(x, y);
+//		Debug.Log("check point " + checkPoint.ToString());
         foreach (IPTiledObject tiledObject in objects)
         {
-            if (tiledObject.GetRect().Contains(new Vector2(x, y)))
+            if (tiledObject.GetRectInPoint().Contains(checkPoint))
             {
                 objectList.Add(tiledObject);
             }
@@ -57,10 +60,9 @@ public class IPObjectLayer : IPMapLayer
     public List<IPTiledObject> GetTiledObjectsIntersectingRect(Rect checkRect)
     {
         List<IPTiledObject> objectList = new List<IPTiledObject>();
-
         foreach (IPTiledObject tiledObject in objects)
         {
-            if (tiledObject.GetRect().CheckIntersect(checkRect))
+            if (tiledObject.GetRectInPoint().CheckIntersect(checkRect))
             {
                 objectList.Add(tiledObject);
             }

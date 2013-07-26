@@ -12,8 +12,8 @@ public class IPTile : FSprite
     public IPTile(IPTileData tileData) : base(tileData.GetAssetName())
     {
         this.TileData = tileData;
-        //this.anchorX = 0;
-        //this.anchorY = 1;
+        this.anchorX = 0;
+        this.anchorY = 0;
 
     }
 

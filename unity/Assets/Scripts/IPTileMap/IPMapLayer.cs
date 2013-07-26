@@ -15,12 +15,24 @@ public class IPMapLayer : FContainer
     public int HeightInTiles { get; set; }
 
     public int TileWidth { get; set; }
-
     public int TileHeight { get; set; }
+	
+	public float TileWidthInPoint {
+		get {return TileWidth / Futile.displayScale;}	
+	}
+	public float TileHeightInPoint {
+		get {return TileHeight / Futile.displayScale;}	
+	}
 
     public int Width { get { return WidthInTiles * TileWidth; } }
-
     public int Height { get { return HeightInTiles * TileHeight; } }
+	
+	public float WidthInPoint {
+		get {return WidthInTiles * TileWidthInPoint;}
+	}
+	public float HeightInPoint {
+		get {return HeightInTiles * TileHeightInPoint;}	
+	}
 
     public string LayerType { get; set; }
 

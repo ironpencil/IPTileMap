@@ -71,8 +71,14 @@ public class IPTileSet
     }
 
     public int TileWidth { get; set; }
-
     public int TileHeight { get; set; }
+	
+	public float TileWidthInPoint {
+		get {return TileWidth / Futile.displayScale;}	
+	}
+	public float TileHeightInPoint {
+		get {return TileHeight / Futile.displayScale;}	
+	}
 
     public string GetTilePropertyDescription()
     {
