@@ -11,7 +11,7 @@ Differences:
 - a very very simple tutorial
 
 
-IMPORTANT: you should call the functions that is ended with "InPoint".
+IMPORTANT: you should call the functions that is ended with "InPoint" to work with point in Futile.
 
 
 TODO:
