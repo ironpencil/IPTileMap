@@ -25,9 +25,15 @@ public class IPTileMap : FContainer
 
     public int Width { get { return TileWidth * WidthInTiles; } }
     public int Height { get { return TileHeight * HeightInTiles; } }
+	
+	public float WidthInPoint {get {return TileWidthInPoint * WidthInTiles;}}
+	public float HeightInPoint {get {return TileHeightInPoint * HeightInTiles;}}
 
     public int TileWidth { get; set; }
     public int TileHeight { get; set; }
+	
+	public float TileWidthInPoint {get {return TileWidth / Futile.displayScale;}}
+	public float TileHeightInPoint {get {return TileHeight / Futile.displayScale;}}
 
     public int WidthInTiles { get; set; }
     public int HeightInTiles { get; set; }
@@ -71,14 +77,14 @@ public class IPTileMap : FContainer
         foreach (Dictionary<string, object> tileSetData  in tileSetsData)
         {
             IPTileSet tileSet = new IPTileSet();
-
+	
             tileSet.FirstGID = int.Parse(tileSetData["firstgid"].ToString());
             tileSet.Image = tileSetData["image"].ToString();
             tileSet.Name = tileSetData["name"].ToString();
             tileSet.TileWidth = int.Parse(tileSetData["tilewidth"].ToString());
             tileSet.TileHeight = int.Parse(tileSetData["tileheight"].ToString());
-
-            tileSet.SetupTileProperties((Dictionary<string, object>)tileSetData["tileproperties"]);
+			
+            tileSet.SetupTileProperties((Dictionary<string, object>)tileSetData["properties"]);	// ["tileproperties"]
 
             tileSets.Add(tileSet.FirstGID, tileSet);
             tileSetFirstGIDs.Add(tileSet.FirstGID);
@@ -113,7 +119,10 @@ public class IPTileMap : FContainer
             mapLayer.HeightInTiles = int.Parse(layerData["height"].ToString());
             mapLayer.Opacity = int.Parse(layerData["opacity"].ToString());
             mapLayer.LayerType = layerData["type"].ToString();
-            mapLayer.LayerProperties = (Dictionary<string, object>)layerData["properties"];
+			
+			if (layerData.ContainsKey("properties")) {
+            	mapLayer.LayerProperties = (Dictionary<string, object>)layerData["properties"];
+			}
             
             //these are being pulled from the map, assume same tile size for whole map
             mapLayer.TileWidth = TileWidth;
@@ -124,6 +133,7 @@ public class IPTileMap : FContainer
                 IPTileLayer tileLayer = mapLayer as IPTileLayer;
 
                 tileLayer.InitializeTileArray(mapLayer.WidthInTiles, tileLayer.HeightInTiles);
+				
                 //load the tile layer
                 List<object> tileGIDs = (List<object>) layerData["data"];
 
@@ -135,33 +145,40 @@ public class IPTileMap : FContainer
                     int tileGID = int.Parse(tileGIDs[i].ToString());
 
                     //GID of 0 means there is no tile?
-                    if (tileGID > 0)
+                    if (tileGID >= 0)
                     {                      
-                        IPTileData tileData = new IPTileData();
+						
+						if (tileGID > 0) {
+	                        IPTileData tileData = new IPTileData();
+	
+	                        tileData.Layer = tileLayer;
+	//                        tileData.GID = int.Parse(tileGIDs[i].ToString());
+							tileData.GID = tileGID;
+	                        tileData.TileSet = FindTileSetContainingGID(tileData.GID);
+	
+	                        tileData.TileX = x;
+	                        tileData.TileY = tileLayer.HeightInTiles - y - 1; //TileY should count up from the bottom
 
-                        tileData.Layer = tileLayer;
-                        tileData.GID = int.Parse(tileGIDs[i].ToString());
-                        tileData.TileSet = FindTileSetContainingGID(tileData.GID);
-
-                        tileData.TileX = x;
-                        tileData.TileY = tileLayer.HeightInTiles - y - 1; //TileY should count up from the bottom
-
-                        x++;
+                        
+						
+					
+	                        IPTile tile = new IPTile(tileData);
+							
+	                        tile.x = tileData.TileX * tileData.TileSet.TileWidthInPoint;
+	                        tile.y = tileData.TileY * tileData.TileSet.TileHeightInPoint;
+	
+	                        //the tile physically resides in the TileLayer container
+	                        //when the tile layer is added to the container, the tile will be as well
+	                        tileLayer.AddTile(tile);
+						}
+						
+						x++;
 
                         if (x % mapLayer.WidthInTiles == 0)
                         {
                             x = 0;
                             y++;
                         }
-
-                        IPTile tile = new IPTile(tileData);
-
-                        tile.x = tileData.TileX * tileData.TileSet.TileWidth;
-                        tile.y = tileData.TileY * tileData.TileSet.TileHeight;
-
-                        //the tile physically resides in the TileLayer container
-                        //when the tile layer is added to the container, the tile will be as well
-                        tileLayer.AddTile(tile);
                     }
                 }
 
@@ -187,16 +204,31 @@ public class IPTileMap : FContainer
                     tiledObject.Name = objectDef["name"].ToString();
                     tiledObject.ObjType = objectDef["type"].ToString();
                     tiledObject.Visible = bool.Parse(objectDef["visible"].ToString());
-                    tiledObject.x = float.Parse(objectDef["x"].ToString());
-                    tiledObject.y = float.Parse(objectDef["y"].ToString());
+                    tiledObject.x = float.Parse(objectDef["x"].ToString()) / Futile.displayScale;
+                    tiledObject.y = (Height - float.Parse(objectDef["y"].ToString())) / Futile.displayScale;	// Tiled count from top
                     tiledObject.ObjWidth = float.Parse(objectDef["width"].ToString());
                     tiledObject.ObjHeight = float.Parse(objectDef["height"].ToString());
                     tiledObject.ObjProperties = (Dictionary<string, object>)objectDef["properties"];
+					
+//					FSprite sprite = new FSprite(Futile.whiteElement);
+//					sprite.SetPosition((tiledObject.GetPosition()));
+//					sprite.width = tiledObject.ObjWidthInPoint;
+//					sprite.height = tiledObject.ObjHeightInPoint;
+//					sprite.color = Color.red;
+//					sprite.sortZ = 1000;
+//					sprite.SetAnchor(new Vector2(0, 1));
+//					Futile.stage.AddChild(sprite);
+//					Futile.stage.shouldSortByZ = true;
+//					
+//					Debug.Log("tile object pos " + tiledObject.GetPosition().ToString());
+//					Debug.Log("tile object width height " + tiledObject.ObjWidthInPoint + " " + tiledObject.ObjHeightInPoint);
+//	
+//					Futile.stage.AddChild(sprite);
+//					Futile.stage.shouldSortByZ = true;
 
-                    //adjust y value for Futile (count upwards instead of downwards like in Tiled)
-                    tiledObject.y = objectLayer.Height - tiledObject.y - objectLayer.TileHeight;
+//                    //adjust y value for Futile (count upwards instead of downwards like in Tiled)
+//                    tiledObject.y = objectLayer.Height - tiledObject.y - objectLayer.TileHeight;
                     
-
                     objectLayer.AddObject(tiledObject);                    
 
                 }

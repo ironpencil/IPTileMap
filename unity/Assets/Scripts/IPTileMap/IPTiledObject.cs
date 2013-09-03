@@ -17,8 +17,14 @@ public class IPTiledObject : FContainer
     public bool Visible { get; set; }
 
     public float ObjWidth { get; set; }
-
     public float ObjHeight { get; set; }
+	
+	public float ObjWidthInPoint {
+		get {return ObjWidth / Futile.displayScale;}
+	}
+	public float ObjHeightInPoint {
+		get {return ObjHeight / Futile.displayScale;}	
+	}
 
     private Dictionary<string, object> objProperties = new Dictionary<string, object>();
     public Dictionary<string, object> ObjProperties { get { return objProperties; } set { objProperties = value; } }
@@ -80,4 +86,13 @@ public class IPTiledObject : FContainer
 
         return objectRect;
     }
+	
+	public Rect GetRectInPoint () {
+		float objLeftInPoint = this.x;//- (this.ObjWidthInPoint / 2);
+		float objBottomInPoint = this.y - (this.ObjHeightInPoint);
+		
+		Rect objectRectInPoint = new Rect(objLeftInPoint, objBottomInPoint, this.ObjWidthInPoint, this.ObjHeightInPoint);
+//		Debug.Log("object rect " + objectRectInPoint.ToString());
+		return objectRectInPoint;
+	}
 }
